@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+typedef struct {
+    int key;
+    int value;
+    bool occupied;
+} HashEntry;
+
+int hash(int key, int capacity) {
+    // Handle negative numbers safely
+    unsigned int h = (unsigned int)key;
+    return h % capacity;
+}
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    // Capacity should be bigger than size to reduce collisions
+    int capacity = numsSize * 2;
+    HashEntry* hashTable = (HashEntry*)calloc(capacity, sizeof(HashEntry));
+
+    int* result = (int*)malloc(2 * sizeof(int));
+    *returnSize = 2;
+
+    for (int i = 0; i < numsSize; i++) {
+        int complement = target - nums[i];
+        int index = hash(complement, capacity);
+
+        // Linear probing to find complement
+        while (hashTable[index].occupied) {
+            if (hashTable[index].key == complement) {
+                result[0] = hashTable[index].value;
+                result[1] = i;
+                free(hashTable);
+                return result;
+            }
+            index = (index + 1) % capacity;
+        }
+
+        // Insert current element into hash table
+        index = hash(nums[i], capacity);
+        while (hashTable[index].occupied) {
+            index = (index + 1) % capacity;
+        }
+        hashTable[index].key = nums[i];
+        hashTable[index].value = i;
+        hashTable[index].occupied = true;
+    }
+
+    free(hashTable);
+    *returnSize = 0;
+    return NULL;
+}
