@@ -1,0 +1,36 @@
+#include <stdio.h>
+#include <string.h>
+
+int lengthOfLongestSubstring(char* s) {
+    // Array to store the last seen index of all 256 ASCII characters.
+    // Initialize all entries to -1 (meaning character not seen yet).
+    int charMap[256];
+    for (int i = 0; i < 256; i++) {
+        charMap[i] = -1;
+    }
+
+    int left = 0;
+    int maxLen = 0;
+    int len = strlen(s);
+
+    for (int right = 0; right < len; right++) {
+        // Cast char to unsigned char to safely index array (0 to 255)
+        unsigned char c = (unsigned char)s[right];
+
+        // If character was seen inside the current window, move left pointer past it
+        if (charMap[c] >= left) {
+            left = charMap[c] + 1;
+        }
+
+        // Record the current character's index
+        charMap[c] = right;
+
+        // Calculate window length
+        int currentLen = right - left + 1;
+        if (currentLen > maxLen) {
+            maxLen = currentLen;
+        }
+    }
+
+    return maxLen;
+}
